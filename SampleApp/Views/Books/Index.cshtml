@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div>
+    <h1>My Books</h1>
+    <div class="row mb-4">
+         <div class="col-sm">
+            <a class="btn btn-success" asp-area="" asp-action="AddOrEdit">Add new</a>
+         </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-sm">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Name</th>
+                        <th scope="col"></th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var x in ViewBag.Books)
+                        {<tr>
+                            <th scope="row">@x.Id</th>
+                            <td>@x.Name</td>
+                            <td>
+                                <a class="btn btn-primary" asp-area="" asp-action="AddOrEdit" asp-route-id="@x.Id">Edit</a>
+                            </td>
+                            <td>
+                                <a class="btn btn-danger" asp-area="" asp-action="Delete" asp-route-id="@x.Id">Delete</a>
+                            </td>
+                        </tr>}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

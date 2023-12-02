@@ -1,0 +1,22 @@
+﻿@model Book
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div>
+    @if(string.IsNullOrEmpty(Model.Id))
+        {<h1>Add New Book</h1>} 
+    else
+        {<h1>Edit Book</h1>}
+
+    <form method="post" asp-action="AddOrEdit">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label asp-for="Name">Name</label>
+            <input asp-for="Name" type="text" class="form-control" id="name" placeholder="Enter name">
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-success">Save</button>
+    </form>
+</div>
