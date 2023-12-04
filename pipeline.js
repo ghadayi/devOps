@@ -18,11 +18,11 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
+       // stage('Test') {
+        //    steps {
                 // Run tests here (e.g., using NUnit or MSTest)
-            }
-        }
+        //    }
+      //  }
 
         stage('Dockerize') {
             steps {
