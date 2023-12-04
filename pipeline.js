@@ -36,9 +36,9 @@ pipeline {
             when {
                 anyOf {
                     branch 'develop'
-                    branch 'release-*'
+                    branch 'release/*'
                     branch 'main'
-                    branch 'hotfix-*'
+                    branch 'hotfix/*'
                 }
             }
             steps {
@@ -54,9 +54,9 @@ pipeline {
             when {
                 anyOf {
                     branch 'develop'
-                    branch 'release-*'
+                    branch 'release/*'
                     branch 'main'
-                    branch 'hotfix-*'
+                    branch 'hotfix/*'
                 }
             }
             steps {
@@ -74,7 +74,7 @@ pipeline {
             when {
                 anyOf {
                     branch 'main'
-                    branch 'release-*'
+                    branch 'release/*'
                 }
             }
             steps {
