@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         // Define necessary environment variables
-        DOCKER_IMAGE = 'Dockerfile' // Replace with your Docker image name
+        DOCKER_IMAGE = 'ghadayi/booktracker' // Replace with your Docker image name
         GKE_CREDENTIALS_ID = 'gcp-service-account' // Jenkins credentials ID for Google Cloud
         DOCKER_CREDENTIALS_ID = 'docker-hub-credentials' // Jenkins credentials ID for docker-hub
     }
