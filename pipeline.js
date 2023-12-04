@@ -56,17 +56,18 @@ pipeline {
                     // Load GCP service account key from Jenkins credentials
                     withCredentials([file(credentialsId: env.GKE_CREDENTIALS_ID, variable: 'GCP_KEY_FILE')]) {
                         // Activate the service account with Google Cloud SDK
-                        sh 'gcloud auth activate-service-account --key-file $GCP_KEY_FILE'
+                        bat 'gcloud auth activate-service-account --key-file %GCP_KEY_FILE%'
                         
                         // Get credentials for your GKE cluster
-                        sh 'gcloud container clusters get-credentials autopilot-cluster-1 --region asia-southeast1 --project booming-splicer-406808'
+                        bat 'gcloud container clusters get-credentials autopilot-cluster-1 --region asia-southeast1 --project booming-splicer-406808'
                     }
         
                     // Apply the Kubernetes deployment
-                    sh 'kubectl apply -f k8s-deployment.yml'
+                    bat 'kubectl apply -f k8s-deployment.yml'
                 }
             }
         }
+        
         
 
         // ... other stages ...
