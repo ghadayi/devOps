@@ -47,15 +47,16 @@ pipeline {
             }
         }
 
+   
         stage('Docker Security Scan') {
             steps {
                 script {
-                    // Run Trivy scan without the --no-progress flag
-                    bat "docker run --rm -v //var/run/docker.sock://var/run/docker.sock -v %HOME%/.cache:/root/.cache/ aquasec/trivy ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
+                    // Correctly run Trivy scan on the Docker image
+                    bat "docker run --rm -v //var/run/docker.sock://var/run/docker.sock -v %HOME%/.cache:/root/.cache/ aquasec/trivy image ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
                 }
             }
         }
-        
+                
         
 
         stage('Push Docker Image') {
