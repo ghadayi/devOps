@@ -14,7 +14,8 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat 'dotnet restore SampleApp.sln'
+                 // Restore NuGet packages
+                 bat 'dotnet restore SampleApp.sln'
 
                  bat "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" SampleApp.sln /p:Configuration=Release"
 
