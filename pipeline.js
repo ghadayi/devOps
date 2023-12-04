@@ -50,11 +50,12 @@ pipeline {
         stage('Docker Security Scan') {
             steps {
                 script {
-                    // Pull Trivy image and run a scan
-                    bat "docker run --rm -v //var/run/docker.sock://var/run/docker.sock -v %HOME%/.cache:/root/.cache/ aquasec/trivy --no-progress ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
+                    // Run Trivy scan without the --no-progress flag
+                    bat "docker run --rm -v //var/run/docker.sock://var/run/docker.sock -v %HOME%/.cache:/root/.cache/ aquasec/trivy ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
                 }
             }
         }
+        
         
 
         stage('Push Docker Image') {
