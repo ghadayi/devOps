@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aspnet-app-deployment
+spec:
+  replicas: 3 # Adjust the number of replicas as needed
+  selector:
+    matchLabels:
+      app: aspnet-app
+  template:
+    metadata:
+      labels:
+        app: aspnet-app
+    spec:
+      containers:
+        - name: aspnet-app
+          image: ghadayi/booktracker:latest # Replace with your Docker image
+          ports:
+            - containerPort: 80 # Adjust if your app uses a different port
