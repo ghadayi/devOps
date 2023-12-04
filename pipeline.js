@@ -10,6 +10,8 @@ pipeline {
         DOCKER_IMAGE = 'ghadayi/booktracker' // Replace with your Docker image name
         GKE_CREDENTIALS_ID = 'gcp-service-account' // Jenkins credentials ID for Google Cloud
         DOCKER_CREDENTIALS_ID = 'docker-hub-credentials' // Jenkins credentials ID for docker-hub
+        DOCKER_TAG = "${env.BUILD_NUMBER}_${env.GIT_COMMIT}" // Combines build number and Git commit hash
+
     }
 
     stages {
@@ -41,10 +43,11 @@ pipeline {
             }
             steps {
                 script {
-                    // Build Docker image
-                    docker.build(env.DOCKER_IMAGE)
-                }
+ 
+                    // Build Docker image with specific tag
+                docker.build("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}")
             }
+          }
         }
 
         stage('Push Docker Image') {
@@ -58,10 +61,11 @@ pipeline {
             }
             steps {
                 script {
-                    // Push to Docker registry
+                    // Log in to Docker registry
                     docker.withRegistry('https://registry.hub.docker.com', env.DOCKER_CREDENTIALS_ID) {
-                        docker.image(env.DOCKER_IMAGE).push('latest')
-                    }
+                        // Push the tagged image
+                        docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
+                         }
                 }
             }
         }
