@@ -1,22 +1,23 @@
-# Use .net core SDK image
+# Build Stage
 FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build
-#change the workdir to /app on the container
 WORKDIR /app
 
-# copy all necessary files and run dotnet restore to download all  the dependencies
+# Copy solution and project files and restore dependencies
 COPY *.sln .
 COPY SampleApp/*.csproj ./SampleApp/
 RUN dotnet restore
 
-# copy everything else and build the app
+# Copy the rest of the source code and build the app
 COPY SampleApp/. ./SampleApp/
 WORKDIR /app/SampleApp
 RUN dotnet publish -c Release -o out
 
-# Use .net core runtime image
+# Runtime Stage
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.2 AS runtime
 WORKDIR /app
-#copy built files to the container
+
+# Copy compiled binaries from the build stage
 COPY --from=build /app/SampleApp/out ./
-#run the app
+
+# Set the entry point for the application
 ENTRYPOINT ["dotnet", "SampleApp.dll"]
