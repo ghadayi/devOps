@@ -15,7 +15,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/ghadayi/devOps.git'
+                git branch: "${env.BRANCH_NAME}", url: 'https://github.com/ghadayi/devOps.git'
             }
         }
 
@@ -31,6 +31,14 @@ pipeline {
         // ... other stages like 'Test' ...
 
         stage('Dockerize') {
+            when {
+                anyOf {
+                    branch 'develop'
+                    branch 'release-*'
+                    branch 'main'
+                    branch 'hotfix-*'
+                }
+            }
             steps {
                 script {
                     // Build Docker image
@@ -40,6 +48,14 @@ pipeline {
         }
 
         stage('Push Docker Image') {
+            when {
+                anyOf {
+                    branch 'develop'
+                    branch 'release-*'
+                    branch 'main'
+                    branch 'hotfix-*'
+                }
+            }
             steps {
                 script {
                     // Push to Docker registry
@@ -51,6 +67,12 @@ pipeline {
         }
 
         stage('Deploy to GKE') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'release-*'
+                }
+            }
             steps {
                 script {
                     // Load GCP service account key from Jenkins credentials
@@ -67,8 +89,6 @@ pipeline {
                 }
             }
         }
-        
-        
 
         // ... other stages ...
     }
