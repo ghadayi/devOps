@@ -15,7 +15,7 @@ pipeline {
         stage('Build') {
             steps {
                // bat "msbuild SampleApp.sln /p:Configuration=Release" // Build command
-                bat "\"${tool 'MSBuild'}\" SampleApp.sln /p:Configuration=Release"
+                bat "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" SampleApp.sln /p:Configuration=Release"
 
             }
         }
