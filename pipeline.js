@@ -14,7 +14,9 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat "msbuild SampleApp.sln /p:Configuration=Release" // Build command
+               // bat "msbuild SampleApp.sln /p:Configuration=Release" // Build command
+                 bat '"${tool 'MSBuild'}" SampleApp.sln /p:Configuration=Release' // Correct command to invoke MSBuild
+
             }
         }
 
