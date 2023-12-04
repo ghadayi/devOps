@@ -11,7 +11,6 @@ pipeline {
         GKE_CREDENTIALS_ID = 'gcp-service-account' // Jenkins credentials ID for Google Cloud
         DOCKER_CREDENTIALS_ID = 'docker-hub-credentials' // Jenkins credentials ID for docker-hub
         DOCKER_TAG = "${env.BUILD_NUMBER}_${env.GIT_COMMIT}" // Combines build number and Git commit hash
-
     }
 
     stages {
@@ -25,7 +24,6 @@ pipeline {
             steps {
                 // Restore NuGet packages
                 bat 'dotnet restore SampleApp.sln'
-
                 bat "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" SampleApp.sln /p:Configuration=Release"
             }
         }
@@ -43,11 +41,19 @@ pipeline {
             }
             steps {
                 script {
- 
                     // Build Docker image with specific tag
-                docker.build("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}")
+                    docker.build("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}")
+                }
             }
-          }
+        }
+
+        stage('Docker Security Scan') {
+            steps {
+                script {
+                    // Pull Trivy image and run a scan
+                    sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.cache:/root/.cache/ aquasec/trivy --no-progress ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
+                }
+            }
         }
 
         stage('Push Docker Image') {
@@ -65,7 +71,7 @@ pipeline {
                     docker.withRegistry('https://registry.hub.docker.com', env.DOCKER_CREDENTIALS_ID) {
                         // Push the tagged image
                         docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
-                         }
+                    }
                 }
             }
         }
