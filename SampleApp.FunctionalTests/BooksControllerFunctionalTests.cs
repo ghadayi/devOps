@@ -10,7 +10,7 @@ namespace SampleApp.FunctionalTests
         {
             using (var driver = new ChromeDriver())
             {
-                driver.Navigate().GoToUrl("http://localhost:5000/Books/Index");
+                driver.Navigate().GoToUrl("http://34.124.220.35:80/Books/Index");
                 Assert.Contains("Books", driver.PageSource);
             }
         }
