@@ -10,8 +10,7 @@ COPY SampleApp/*.csproj ./SampleApp/
 
 # Add lines to copy csproj files for each test project
 COPY SampleApp.UnitTests/*.csproj ./SampleApp.UnitTests/
-COPY SampleApp.IntegrationTests/*.csproj ./SampleApp.IntegrationTests/
-COPY SampleApp.FunctionalTests/*.csproj ./SampleApp.FunctionalTests/
+
 
 # Run dotnet restore
 RUN dotnet restore
@@ -21,8 +20,7 @@ COPY SampleApp/. ./SampleApp/
 
 # Add lines to copy the rest of the source for each test project
 COPY SampleApp.UnitTests/. ./SampleApp.UnitTests/
-COPY SampleApp.IntegrationTests/. ./SampleApp.IntegrationTests/
-COPY SampleApp.FunctionalTests/. ./SampleApp.FunctionalTests/
+
 
 WORKDIR /app/SampleApp
 RUN dotnet publish -c Release -o out

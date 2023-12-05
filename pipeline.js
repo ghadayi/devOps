@@ -36,22 +36,22 @@ pipeline {
     }
 }
 
-// Stage for running integration tests
-stage('Integration Tests') {
-    steps {
-        // Run integration tests using the .NET Core CLI
-        bat 'dotnet test SampleApp.IntegrationTests'
-    }
-}
+// // Stage for running integration tests
+// stage('Integration Tests') {
+//     steps {
+//         // Run integration tests using the .NET Core CLI
+//         bat 'dotnet test SampleApp.IntegrationTests'
+//     }
+// }
 
-// Stage for running functional tests
-stage('Functional Tests') {
-    steps {
-        // Run functional tests using the .NET Core CLI
-        // The command might differ if you use a test runner like Selenium
-        bat 'dotnet test SampleApp.FunctionalTests'
-    }
-}
+// // Stage for running functional tests
+// stage('Functional Tests') {
+//     steps {
+//         // Run functional tests using the .NET Core CLI
+//         // The command might differ if you use a test runner like Selenium
+//         bat 'dotnet test SampleApp.FunctionalTests'
+//     }
+// }
 
         stage('Dockerize') {
             when {

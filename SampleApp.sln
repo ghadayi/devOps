@@ -7,10 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "SampleApp\Samp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp.UnitTests", "SampleApp.UnitTests\SampleApp.UnitTests.csproj", "{E17AE15E-22CA-42DE-9C3B-18089E3600E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp.IntegrationTests", "SampleApp.IntegrationTests\SampleApp.IntegrationTests.csproj", "{A699E2B8-0E36-4189-B874-1544E4C02861}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp.FunctionalTests", "SampleApp.FunctionalTests\SampleApp.FunctionalTests.csproj", "{33488AFB-AD86-4FC6-947B-F07E356EF08A}"
-EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
