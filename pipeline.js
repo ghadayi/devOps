@@ -127,10 +127,10 @@ pipeline {
             steps {
                 script {
                     // Verify if Cloud Logging is enabled
-                    bat "gcloud container clusters describe autopilot-cluster-1 --region asia-southeast1 --format='value(loggingService)' --project booming-splicer-406808"
+                    bat 'gcloud container clusters describe autopilot-cluster-1 --region asia-southeast1 --format="value(loggingService)" --project booming-splicer-406808'
 
                     // Check if Cloud Monitoring is configured
-                    bat "gcloud container clusters describe autopilot-cluster-1 --region asia-southeast1 --format='value(monitoringService)' --project booming-splicer-406808"
+                    bat 'gcloud container clusters describe autopilot-cluster-1 --region asia-southeast1 --format="value(monitoringService)" --project booming-splicer-406808'
         
                     // Optionally, deploy or configure any additional monitoring/logging tools if needed
                     // For example, deploying a custom metrics exporter, configuring Fluentd, etc.
