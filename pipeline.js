@@ -22,13 +22,36 @@ pipeline {
 
         stage('Build') {
             steps {
-                // Restore NuGet packages
+                // Restore NuGet packages and build the solution
                 bat 'dotnet restore SampleApp.sln'
                 bat "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" SampleApp.sln /p:Configuration=Release"
             }
         }
 
-        // ... other stages like 'Test' ...
+   // Stage for running unit tests
+   stage('Unit Tests') {
+    steps {
+        // Run unit tests using the .NET Core CLI
+        bat 'dotnet test SampleApp.UnitTests'
+    }
+}
+
+// Stage for running integration tests
+stage('Integration Tests') {
+    steps {
+        // Run integration tests using the .NET Core CLI
+        bat 'dotnet test SampleApp.IntegrationTests'
+    }
+}
+
+// Stage for running functional tests
+stage('Functional Tests') {
+    steps {
+        // Run functional tests using the .NET Core CLI
+        // The command might differ if you use a test runner like Selenium
+        bat 'dotnet test SampleApp.FunctionalTests'
+    }
+}
 
         stage('Dockerize') {
             when {
@@ -40,24 +63,21 @@ pipeline {
                 }
             }
             steps {
+                // Build Docker image with specific tag
                 script {
-                    // Build Docker image with specific tag
                     docker.build("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}")
                 }
             }
         }
 
-   
         stage('Docker Security Scan') {
             steps {
+                // Run security scan on the Docker image using Trivy
                 script {
-                    // Correctly run Trivy scan on the Docker image
                     bat "docker run --rm -v //var/run/docker.sock://var/run/docker.sock -v %HOME%/.cache:/root/.cache/ aquasec/trivy image ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
                 }
             }
         }
-                
-        
 
         stage('Push Docker Image') {
             when {
@@ -69,10 +89,9 @@ pipeline {
                 }
             }
             steps {
+                // Push the built Docker image to the Docker registry
                 script {
-                    // Log in to Docker registry
                     docker.withRegistry('https://registry.hub.docker.com', env.DOCKER_CREDENTIALS_ID) {
-                        // Push the tagged image
                         docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
                     }
                 }
@@ -87,6 +106,7 @@ pipeline {
                 }
             }
             steps {
+                // Deploy the application to Google Kubernetes Engine
                 script {
                     // Load GCP service account key from Jenkins credentials
                     withCredentials([file(credentialsId: env.GKE_CREDENTIALS_ID, variable: 'GCP_KEY_FILE')]) {

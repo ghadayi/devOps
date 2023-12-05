@@ -3,7 +3,7 @@ services:
   web:
     build: .
     ports:
-      - "5000:80" # Assuming your app listens on port 80; change if different
+      - "5001:80" # Assuming your app listens on port 80; change if different
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
    
