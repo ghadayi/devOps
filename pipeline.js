@@ -127,10 +127,10 @@ pipeline {
             steps {
                 script {
                     // Verify if Cloud Logging is enabled
-                    bat "gcloud container clusters describe autopilot-cluster-1 --region asia-southeast1 --format='value(loggingService)'"
-        
+                    bat "gcloud container clusters describe autopilot-cluster-1 --region asia-southeast1 --format='value(loggingService)' --project booming-splicer-406808"
+
                     // Check if Cloud Monitoring is configured
-                    bat "gcloud container clusters describe autopilot-cluster-1 --region asia-southeast1 --format='value(monitoringService)'"
+                    bat "gcloud container clusters describe autopilot-cluster-1 --region asia-southeast1 --format='value(monitoringService)' --project booming-splicer-406808"
         
                     // Optionally, deploy or configure any additional monitoring/logging tools if needed
                     // For example, deploying a custom metrics exporter, configuring Fluentd, etc.
@@ -138,6 +138,20 @@ pipeline {
         
                     // Confirm that the necessary monitoring and logging configurations are in place
                     echo "Monitoring and logging configuration verified."
+                }
+            }
+        }
+        stage('Validate Alerting Policies') {
+            steps {
+                script {
+                    // List the current alerting policies in Cloud Monitoring
+                    bat "gcloud alpha monitoring policies list"
+        
+                    // Optionally, add additional checks or scripts to validate specific aspects of the alerting policies
+                    // For instance, checking for the existence of certain critical alerts or verifying configurations
+        
+                    // Confirm that the alerting policies validation is complete
+                    echo "Alerting policies validation completed."
                 }
             }
         }
