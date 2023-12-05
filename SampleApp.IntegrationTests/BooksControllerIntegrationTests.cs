@@ -7,16 +7,19 @@ public class BooksControllerIntegrationTests : IClassFixture<WebApplicationFacto
 {
     private readonly HttpClient _client;
 
-    public BooksControllerIntegrationTests(WebApplicationFactory<Startup> factory)
+    public BooksControllerIntegrationTests(WebApplicationFactory<SampleApp.Startup> factory)
     {
-        _client = factory.CreateClient();
+        // Create a client with a specific base address
+        _client = factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            BaseAddress = new Uri("http://34.124.220.35:80/")
+        });
     }
 
-    [Fact]
     public async Task Get_Index_ReturnsAViewResult_WithAListOfBooks()
     {
         // Act
-        var response = await _client.GetAsync("/Books/Index");
+        var response = await _client.GetAsync("Books/Index");
 
         // Assert
         response.EnsureSuccessStatusCode();
