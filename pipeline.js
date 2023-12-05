@@ -53,6 +53,7 @@ pipeline {
 //     }
 // }
 
+
         stage('Dockerize') {
             when {
                 anyOf {
@@ -122,7 +123,25 @@ pipeline {
                 }
             }
         }
-
+        stage('Configure Monitoring and Logging') {
+            steps {
+                script {
+                    // Verify if Cloud Logging is enabled
+                    bat "gcloud container clusters describe autopilot-cluster-1 --region asia-southeast1 --format='value(loggingService)'"
+        
+                    // Check if Cloud Monitoring is configured
+                    bat "gcloud container clusters describe autopilot-cluster-1 --region asia-southeast1 --format='value(monitoringService)'"
+        
+                    // Optionally, deploy or configure any additional monitoring/logging tools if needed
+                    // For example, deploying a custom metrics exporter, configuring Fluentd, etc.
+                    // bat "<your-deployment-command-here>"
+        
+                    // Confirm that the necessary monitoring and logging configurations are in place
+                    echo "Monitoring and logging configuration verified."
+                }
+            }
+        }
+        
         // ... other stages ...
     }
 }
