@@ -135,8 +135,9 @@ pipeline {
                     def appUrl = "http://34.124.220.35:80"
         
                     // Execute a curl command to measure response time
-                    // Directly embedding the URL in the command
-                    def responseTime = bat(script: "curl -o /dev/null -s -w '%{time_total}\\n' ${appUrl}", returnStdout: true).trim()
+                    // Correctly formatting the curl command
+                    def curlCommand = "curl -o /dev/null -s -w '%{time_total}' " + appUrl
+                    def responseTime = bat(script: curlCommand, returnStdout: true).trim()
         
                     // Log the response time
                     echo "Response time for ${appUrl} is ${responseTime} seconds."
@@ -154,6 +155,8 @@ pipeline {
                 }
             }
         }
+        
+        
         
         // Validate alerting policies in Cloud Monitoring
         stage('Validate Alerting Policies') {
