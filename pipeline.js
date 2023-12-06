@@ -161,26 +161,27 @@ pipeline {
                 }
             }
         }
-        stage('Check Application Performance') {
-            steps {
-                script {
-                    // Metric identifier for CPU utilization
-                    def metricName = "compute.googleapis.com/instance/cpu/utilization"
+        // stage('Check Application Performance') {
+        //     steps {
+        //         script {
+        //             // Metric identifier for CPU utilization
+        //             def metricName = "compute.googleapis.com/instance/cpu/utilization"
         
-                    // Execute the gcloud command to retrieve the list of metric descriptors
-                    def metricsListOutput = bat(script: "gcloud beta monitoring metrics-scopes list --filter=\"metric.type='${metricName}'\" --format=\"get(description)\"", returnStdout: true).trim()
+        //             // Execute the gcloud beta command to retrieve the list of metric descriptors
+        //             def metricsListOutput = bat(script: "gcloud beta monitoring metrics-scopes list --filter=\"metric.type='${metricName}'\" --format=\"get(description)\"", returnStdout: true).trim()
         
-                    // Check if the CPU utilization metric is present in the output
-                    if (metricsListOutput.contains(metricName)) {
-                        echo "CPU utilization metric is available."
-                        // You can then set up additional checks or alerts based on this information
-                    } else {
-                        echo "CPU utilization metric is not found."
-                        // Handle the case where the metric is not found
-                    }
-                }
-            }
-        }
+        //             // Check if the CPU utilization metric is present in the output
+        //             if (metricsListOutput.contains(metricName)) {
+        //                 echo "CPU utilization metric is available."
+        //                 // You can then set up additional checks or alerts based on this information
+        //             } else {
+        //                 echo "CPU utilization metric is not found."
+        //                 // Handle the case where the metric is not found
+        //             }
+        //         }
+        //     }
+        // }
+        
         
         
         
