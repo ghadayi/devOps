@@ -166,21 +166,17 @@ pipeline {
                 script {
                     // Metric identifier for CPU utilization
                     def metricName = "compute.googleapis.com/instance/cpu/utilization"
-                    def filter = "metric.type=\\\"${metricName}\\\""
-                    def aggregation = "--aggregation=\"alignmentPeriod=300s,perSeriesAligner=ALIGN_MEAN\""
         
-                    // Execute the gcloud command to retrieve the metric data
-                    def cpuUsage = bat(script: "gcloud monitoring time-series describe --filter=${filter} ${aggregation} --format=\"value(points[0].value.doubleValue)\" --order-by=\"timestamp desc\" --limit=1", returnStdout: true).trim()
+                    // Execute the gcloud command to retrieve the list of metrics
+                    def metricsListOutput = bat(script: "gcloud monitoring metrics list --filter=\"metric.type='${metricName}'\" --format=\"get(description)\"", returnStdout: true).trim()
         
-                    // Define your performance threshold
-                    def threshold = 0.8 // Example threshold, adjust as necessary
-        
-                    // Logic to interpret the result and check for performance issues
-                    if (cpuUsage.toFloat() > threshold) {
-                        echo "High CPU usage detected."
-                        // Additional steps to handle the issue, such as alerting or taking corrective action
+                    // Check if the CPU utilization metric is present in the output
+                    if (metricsListOutput.contains(metricName)) {
+                        echo "CPU utilization metric is available."
+                        // You can then set up additional checks or alerts based on this information
                     } else {
-                        echo "CPU usage is within normal limits."
+                        echo "CPU utilization metric is not found."
+                        // Handle the case where the metric is not found
                     }
                 }
             }
