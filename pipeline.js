@@ -129,27 +129,33 @@ pipeline {
             }
         }
         stage('Check Application Performance') {
-                steps {
-                    script {
-                        // Metric identifier for CPU utilization
-                        def metricName = "compute.googleapis.com/instance/cpu/utilization"
-            
-                        // Execute the gcloud beta command to retrieve the list of metric descriptors
-                        def metricsListOutput = bat(script: "gcloud beta monitoring metrics-scopes list --filter=\"metric.type='${metricName}'\" --format=\"get(description)\"", returnStdout: true).trim()
-            
-                        // Check if the CPU utilization metric is present in the output
-                        if (metricsListOutput.contains(metricName)) {
-                            echo "CPU utilization metric is available."
-                            // You can then set up additional checks or alerts based on this information
-                        } else {
-                            echo "CPU utilization metric is not found."
-                            // Handle the case where the metric is not found
-                        }
+            steps {
+                script {
+                    // Example: Monitor the response time of a web application
+        
+                    // Define the URL of your web application
+                    def appUrl = "http://34.124.220.35:80"
+        
+                    // Execute a curl command to measure response time
+                    def responseTime = bat(script: "curl -o /dev/null -s -w '%{time_total}\\n' ${appUrl}", returnStdout: true).trim()
+        
+                    // Log the response time
+                    echo "Response time for ${appUrl} is ${responseTime} seconds."
+        
+                    // Define a threshold for response time (in seconds)
+                    def threshold = 3.0 // Example threshold
+        
+                    // Check if the response time is within the acceptable range
+                    if (Double.parseDouble(responseTime) > threshold) {
+                        echo "Warning: High response time detected."
+                        // Additional steps to handle high response time
+                    } else {
+                        echo "Response time is within acceptable limits."
                     }
                 }
             }
-            
-
+        }
+        
         // Validate alerting policies in Cloud Monitoring
         stage('Validate Alerting Policies') {
             steps {
