@@ -134,7 +134,7 @@ pipeline {
           
                     // Execute a curl command to measure response time
                     // Correctly formatting the curl command
-                    def curlCommand = "curl -o /dev/null -s -w '%{time_total}' http://34.124.220.35:80" 
+                    def curlCommand = "curl -o /dev/null -s -w /'%{time_total}/' "+ "http://34.124.220.35:80/" 
                     def responseTime = bat(script: curlCommand, returnStdout: true).trim()
         
                     // Log the response time
