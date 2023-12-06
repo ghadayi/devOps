@@ -131,19 +131,18 @@ pipeline {
         stage('Check Application Performance') {
             steps {
                 script {
-                    // Example: Monitor the response time of a web application
-        
                     // Define the URL of your web application
                     def appUrl = "http://34.124.220.35:80"
         
                     // Execute a curl command to measure response time
+                    // Directly embedding the URL in the command
                     def responseTime = bat(script: "curl -o /dev/null -s -w '%{time_total}\\n' ${appUrl}", returnStdout: true).trim()
         
                     // Log the response time
                     echo "Response time for ${appUrl} is ${responseTime} seconds."
         
                     // Define a threshold for response time (in seconds)
-                    def threshold = 3.0 // Example threshold
+                    def threshold = 3.0 // Threshold set to 3 seconds
         
                     // Check if the response time is within the acceptable range
                     if (Double.parseDouble(responseTime) > threshold) {
