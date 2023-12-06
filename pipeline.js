@@ -27,7 +27,27 @@ pipeline {
                 bat "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" SampleApp.sln /p:Configuration=Release"
             }
         }
-
+        stage('Upload Build Artifacts to Cloud Storage') {
+            steps {
+                script {
+                    // Load GCP service account key from Jenkins credentials
+                    withCredentials([file(credentialsId: env.GKE_CREDENTIALS_ID, variable: 'GCP_KEY_FILE')]) {
+                        // Activate the service account with Google Cloud SDK
+                        bat 'gcloud auth activate-service-account --key-file %GCP_KEY_FILE%'
+                        
+                        // Define the path of the build artifacts relative to the workspace
+                        def artifactPath = 'SampleApp/bin/Debug' // Updated to the Debug path
+                        
+                        // Specify the destination Cloud Storage bucket
+                        def destinationBucket = 'gs://book-tracker-storage'
+        
+                        // Upload the build artifacts to Cloud Storage
+                        bat "gsutil cp -r ${artifactPath}/* ${destinationBucket}"
+                    }
+                }
+            }
+        }
+        
    // Stage for running unit tests
    stage('Unit Tests') {
     steps {
@@ -141,6 +161,26 @@ pipeline {
                 }
             }
         }
+        stage('Check Application Performance') {
+            steps {
+                script {
+                    // Replace 'metric-name' with the actual metric name and specify your defined threshold
+                    def cpuUsage = bat(script: "gcloud monitoring time-series query \"metric-name\" --limit=1 --format=\"value(point.value.doubleValue)\"", returnStdout: true).trim()
+        
+                    // Define your performance threshold
+                    def YOUR_DEFINED_THRESHOLD = 0.8 // Example threshold, adjust as necessary
+        
+                    // Logic to interpret the result and check for performance issues
+                    if (cpuUsage.toFloat() > YOUR_DEFINED_THRESHOLD) {
+                        echo "High CPU usage detected."
+                        // Additional steps to handle the issue, such as alerting or taking corrective action
+                    } else {
+                        echo "CPU usage is within normal limits."
+                    }
+                }
+            }
+        }
+        
         stage('Validate Alerting Policies') {
             steps {
                 script {
