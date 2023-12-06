@@ -131,10 +131,12 @@ pipeline {
         stage('Check Application Performance') {
             steps {
                 script {
-          
+                    // Define the URL of your web application
+                    def appUrl = "http://34.124.220.35:80"
+        
                     // Execute a curl command to measure response time
-                    // Correctly formatting the curl command
-                    def curlCommand = "curl -o /dev/null -s -w /'%{time_total}/' "+ "http://34.124.220.35:80/" 
+                    // Use single quotes for the script string
+                    def curlCommand = 'curl -o /dev/null -s -w "%{time_total}" ' + appUrl
                     def responseTime = bat(script: curlCommand, returnStdout: true).trim()
         
                     // Log the response time
