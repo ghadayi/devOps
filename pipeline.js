@@ -132,18 +132,18 @@ pipeline {
         stage('Check Application Performance') {
             steps {
                 script {
-                    // Define the URL of your web application as an environment variable
-                    env.APP_URL = "http://34.124.220.35:80"
+                    // Directly define the URL of your web application in the command
+                    def appUrl = "http://34.124.220.35:80"
         
                     // Execute a curl command to measure response time
-                    // Use double quotes for the command and single quotes inside for the -w option
-                    def responseTimeOutput = bat(script: "curl -o NUL -s -w '%{time_total}' ${env.APP_URL}", returnStdout: true).trim()
+                    // Ensure the command is correctly formatted for Windows batch execution
+                    def responseTimeOutput = bat(script: "curl -o NUL -s -w '%%{time_total}' " + appUrl, returnStdout: true).trim()
         
                     // Extract only the response time from the output
                     def responseTime = responseTimeOutput.tokenize().last()
         
                     // Log the response time
-                    echo "Response time for ${env.APP_URL} is ${responseTime} seconds."
+                    echo "Response time for ${appUrl} is ${responseTime} seconds."
         
                     // Define a threshold for response time (in seconds)
                     def threshold = 3.0 // Threshold set to 3 seconds
