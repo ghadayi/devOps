@@ -1,116 +1,99 @@
 pipeline {
     agent any
 
+    // Define the tools used in the pipeline
     tools {
         msbuild 'MSBuild' // The name of the MSBuild installation
     }
 
+    // Set environment variables
     environment {
-        // Define necessary environment variables
-        DOCKER_IMAGE = 'ghadayi/booktracker' // Replace with your Docker image name
-        GKE_CREDENTIALS_ID = 'gcp-service-account' // Jenkins credentials ID for Google Cloud
-        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials' // Jenkins credentials ID for docker-hub
-        DOCKER_TAG = "${env.BUILD_NUMBER}_${env.GIT_COMMIT}" // Combines build number and Git commit hash
+        // Docker image name for the application
+        DOCKER_IMAGE = 'ghadayi/booktracker'
+        // Jenkins credentials ID for Google Cloud
+        GKE_CREDENTIALS_ID = 'gcp-service-account'
+        // Jenkins credentials ID for Docker Hub
+        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'
+        // Tag for Docker image, combining build number and Git commit hash
+        DOCKER_TAG = "${env.BUILD_NUMBER}_${env.GIT_COMMIT}"
     }
 
     stages {
+        // Checkout code from the specified branch and repository
         stage('Checkout') {
             steps {
                 git branch: "${env.BRANCH_NAME}", url: 'https://github.com/ghadayi/devOps.git'
             }
         }
 
+        // Build the application using .NET Core
         stage('Build') {
             steps {
-                // Restore NuGet packages and build the solution
                 bat 'dotnet restore SampleApp.sln'
                 bat "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\" SampleApp.sln /p:Configuration=Release"
             }
         }
+
+        // Upload build artifacts to Google Cloud Storage
         stage('Upload Build Artifacts to Cloud Storage') {
             steps {
                 script {
-                    // Load GCP service account key from Jenkins credentials
                     withCredentials([file(credentialsId: env.GKE_CREDENTIALS_ID, variable: 'GCP_KEY_FILE')]) {
-                        // Activate the service account with Google Cloud SDK
                         bat 'gcloud auth activate-service-account --key-file %GCP_KEY_FILE%'
-                        
-                        // Define the path of the build artifacts relative to the workspace
-                        def artifactPath = 'SampleApp/bin/Debug' // Updated to the Debug path
-                        
-                        // Specify the destination Cloud Storage bucket
+                        def artifactPath = 'SampleApp/bin/Debug'
                         def destinationBucket = 'gs://book-tracker-storage'
-        
-                        // Upload the build artifacts to Cloud Storage
                         bat "gsutil cp -r ${artifactPath}/* ${destinationBucket}"
                     }
                 }
             }
         }
-        
-   // Stage for running unit tests
-   stage('Unit Tests') {
-    steps {
-        // Run unit tests using the .NET Core CLI
-        bat 'dotnet test SampleApp.UnitTests'
-    }
-}
 
-// // Stage for running integration tests
-// stage('Integration Tests') {
-//     steps {
-//         // Run integration tests using the .NET Core CLI
-//         bat 'dotnet test SampleApp.IntegrationTests'
-//     }
-// }
+        // Run unit tests
+        stage('Unit Tests') {
+            steps {
+                bat 'dotnet test SampleApp.UnitTests'
+            }
+        }
 
-// // Stage for running functional tests
-// stage('Functional Tests') {
-//     steps {
-//         // Run functional tests using the .NET Core CLI
-//         // The command might differ if you use a test runner like Selenium
-//         bat 'dotnet test SampleApp.FunctionalTests'
-//     }
-// }
+        // Uncomment and use these stages for integration and functional tests as needed
+        // stage('Integration Tests') {
+        //     steps {
+        //         bat 'dotnet test SampleApp.IntegrationTests'
+        //     }
+        // }
+        // stage('Functional Tests') {
+        //     steps {
+        //         bat 'dotnet test SampleApp.FunctionalTests'
+        //     }
+        // }
 
-
+        // Build Docker image and tag it
         stage('Dockerize') {
             when {
-                anyOf {
-                    branch 'develop'
-                    branch 'release/*'
-                    branch 'main'
-                    branch 'hotfix/*'
-                }
+                anyOf { branch 'develop'; branch 'release/*'; branch 'main'; branch 'hotfix/*' }
             }
             steps {
-                // Build Docker image with specific tag
                 script {
                     docker.build("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}")
                 }
             }
         }
 
+        // Run security scan on Docker image using Trivy
         stage('Docker Security Scan') {
             steps {
-                // Run security scan on the Docker image using Trivy
                 script {
                     bat "docker run --rm -v //var/run/docker.sock://var/run/docker.sock -v %HOME%/.cache:/root/.cache/ aquasec/trivy image ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
                 }
             }
         }
 
+        // Push Docker image to Docker Hub
         stage('Push Docker Image') {
             when {
-                anyOf {
-                    branch 'develop'
-                    branch 'release/*'
-                    branch 'main'
-                    branch 'hotfix/*'
-                }
+                anyOf { branch 'develop'; branch 'release/*'; branch 'main'; branch 'hotfix/*' }
             }
             steps {
-                // Push the built Docker image to the Docker registry
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', env.DOCKER_CREDENTIALS_ID) {
                         docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
@@ -119,88 +102,63 @@ pipeline {
             }
         }
 
+        // Deploy application to Google Kubernetes Engine
         stage('Deploy to GKE') {
             when {
-                anyOf {
-                    branch 'main'
-                    branch 'release/*'
-                }
+                anyOf { branch 'main'; branch 'release/*' }
             }
             steps {
-                // Deploy the application to Google Kubernetes Engine
                 script {
-                    // Load GCP service account key from Jenkins credentials
                     withCredentials([file(credentialsId: env.GKE_CREDENTIALS_ID, variable: 'GCP_KEY_FILE')]) {
-                        // Activate the service account with Google Cloud SDK
                         bat 'gcloud auth activate-service-account --key-file %GCP_KEY_FILE%'
-                        
-                        // Get credentials for your GKE cluster
                         bat 'gcloud container clusters get-credentials autopilot-cluster-1 --region asia-southeast1 --project booming-splicer-406808'
                     }
-        
-                    // Apply the Kubernetes deployment
                     bat 'kubectl apply -f k8s-deployment.yml'
                 }
             }
         }
+
+        // Configure and verify monitoring and logging
         stage('Configure Monitoring and Logging') {
             steps {
                 script {
-                    // Verify if Cloud Logging is enabled
                     bat 'gcloud container clusters describe autopilot-cluster-1 --region asia-southeast1 --format="value(loggingService)" --project booming-splicer-406808'
-
-                    // Check if Cloud Monitoring is configured
                     bat 'gcloud container clusters describe autopilot-cluster-1 --region asia-southeast1 --format="value(monitoringService)" --project booming-splicer-406808'
-        
-                    // Optionally, deploy or configure any additional monitoring/logging tools if needed
-                    // For example, deploying a custom metrics exporter, configuring Fluentd, etc.
-                    // bat "<your-deployment-command-here>"
-        
-                    // Confirm that the necessary monitoring and logging configurations are in place
                     echo "Monitoring and logging configuration verified."
                 }
             }
         }
-        // stage('Check Application Performance') {
-        //     steps {
-        //         script {
-        //             // Metric identifier for CPU utilization
-        //             def metricName = "compute.googleapis.com/instance/cpu/utilization"
-        
-        //             // Execute the gcloud beta command to retrieve the list of metric descriptors
-        //             def metricsListOutput = bat(script: "gcloud beta monitoring metrics-scopes list --filter=\"metric.type='${metricName}'\" --format=\"get(description)\"", returnStdout: true).trim()
-        
-        //             // Check if the CPU utilization metric is present in the output
-        //             if (metricsListOutput.contains(metricName)) {
-        //                 echo "CPU utilization metric is available."
-        //                 // You can then set up additional checks or alerts based on this information
-        //             } else {
-        //                 echo "CPU utilization metric is not found."
-        //                 // Handle the case where the metric is not found
-        //             }
-        //         }
-        //     }
-        // }
-        
-        
-        
-        
-        
+        stage('Check Application Performance') {
+                steps {
+                    script {
+                        // Metric identifier for CPU utilization
+                        def metricName = "compute.googleapis.com/instance/cpu/utilization"
+            
+                        // Execute the gcloud beta command to retrieve the list of metric descriptors
+                        def metricsListOutput = bat(script: "gcloud beta monitoring metrics-scopes list --filter=\"metric.type='${metricName}'\" --format=\"get(description)\"", returnStdout: true).trim()
+            
+                        // Check if the CPU utilization metric is present in the output
+                        if (metricsListOutput.contains(metricName)) {
+                            echo "CPU utilization metric is available."
+                            // You can then set up additional checks or alerts based on this information
+                        } else {
+                            echo "CPU utilization metric is not found."
+                            // Handle the case where the metric is not found
+                        }
+                    }
+                }
+            }
+            
+
+        // Validate alerting policies in Cloud Monitoring
         stage('Validate Alerting Policies') {
             steps {
                 script {
-                    // List the current alerting policies in Cloud Monitoring
                     bat "gcloud alpha monitoring policies list"
-        
-                    // Optionally, add additional checks or scripts to validate specific aspects of the alerting policies
-                    // For instance, checking for the existence of certain critical alerts or verifying configurations
-        
-                    // Confirm that the alerting policies validation is complete
                     echo "Alerting policies validation completed."
                 }
             }
         }
         
-        // ... other stages ...
-    }
+     }
 }
