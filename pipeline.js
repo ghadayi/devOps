@@ -55,17 +55,7 @@ pipeline {
             }
         }
 
-        // Uncomment and use these stages for integration and functional tests as needed
-        // stage('Integration Tests') {
-        //     steps {
-        //         bat 'dotnet test SampleApp.IntegrationTests'
-        //     }
-        // }
-        // stage('Functional Tests') {
-        //     steps {
-        //         bat 'dotnet test SampleApp.FunctionalTests'
-        //     }
-        // }
+       
 
         // Build Docker image and tag it
         stage('Dockerize') {
