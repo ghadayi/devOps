@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netcoreapp2.2</TargetFramework>
+		<IsPackable>false</IsPackable>
+		<IsTestProject>true</IsTestProject>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Updated package references for .NET Core 2.2 compatibility -->
+		<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
+		<!-- Updated version -->
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.6" />
+		<!-- Updated version -->
+
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+		<!-- Updated version -->
+		<PackageReference Include="Moq" Version="4.10.1" />
+		<!-- Compatible version for .NET Core 2.2 -->
+		<PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
+		<!-- Compatible version for .NET Core 2.2 -->
+		<!-- Selenium.WebDriver.ChromeDriver might need to be downgraded or removed depending on compatibility -->
+
+		<PackageReference Include="xunit" Version="2.4.1" />
+		<!-- Updated version -->
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+			<!-- Updated version -->
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<!-- coverlet.collector might not be compatible with .NET Core 2.2, consider removing or replacing -->
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SampleApp\SampleApp.csproj" />
+	</ItemGroup>
+
+</Project>
