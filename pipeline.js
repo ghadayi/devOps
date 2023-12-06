@@ -164,14 +164,19 @@ pipeline {
         stage('Check Application Performance') {
             steps {
                 script {
-                    // Replace 'METRIC_NAME' with the actual metric name and specify your defined threshold
-                    def cpuUsage = bat(script: "gcloud monitoring time-series list --metric=METRIC_NAME --limit=1 --format=\"value(point.value.doubleValue)\"", returnStdout: true).trim()
+                    // Metric identifier for CPU utilization
+                    def metricName = "compute.googleapis.com/instance/cpu/utilization"
+                    def filter = "metric.type=\\\"${metricName}\\\""
+                    def aggregation = "--aggregation=\"alignmentPeriod=300s,perSeriesAligner=ALIGN_MEAN\""
+        
+                    // Execute the gcloud command to retrieve the metric data
+                    def cpuUsage = bat(script: "gcloud monitoring time-series describe --filter=${filter} ${aggregation} --format=\"value(points[0].value.doubleValue)\" --order-by=\"timestamp desc\" --limit=1", returnStdout: true).trim()
         
                     // Define your performance threshold
-                    def YOUR_DEFINED_THRESHOLD = 0.8 // Example threshold, adjust as necessary
+                    def threshold = 0.8 // Example threshold, adjust as necessary
         
                     // Logic to interpret the result and check for performance issues
-                    if (cpuUsage.toFloat() > YOUR_DEFINED_THRESHOLD) {
+                    if (cpuUsage.toFloat() > threshold) {
                         echo "High CPU usage detected."
                         // Additional steps to handle the issue, such as alerting or taking corrective action
                     } else {
@@ -180,6 +185,7 @@ pipeline {
                 }
             }
         }
+        
         
         
         stage('Validate Alerting Policies') {
