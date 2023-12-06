@@ -133,10 +133,16 @@ pipeline {
             steps {
                 script {
                     // Define the URL of your web application
-                    def appUrl = "http://34.124.220.35:80"
+                    def appUrl = 'http://34.124.220.35:80'
         
-                    // Execute a curl command to measure response time
-                    def responseTime = bat(script: "curl -o NUL -s -w \"%{time_total}\" " + appUrl, returnStdout: true).trim()
+                    // Construct the curl command
+                    def curlCommand = "curl -o NUL -s -w \"%{time_total}\" " + appUrl
+        
+                    // Execute the curl command and capture the output
+                    def responseTimeOutput = bat(script: curlCommand, returnStdout: true).trim()
+        
+                    // Extract only the response time from the output
+                    def responseTime = responseTimeOutput.tokenize().last()
         
                     // Log the response time
                     echo "Response time for ${appUrl} is ${responseTime} seconds."
@@ -145,7 +151,7 @@ pipeline {
                     def threshold = 3.0 // Threshold set to 3 seconds
         
                     // Check if the response time is within the acceptable range
-                    if (responseTime.toBigDecimal() > threshold) {
+                    if (responseTime.isNumber() && (responseTime as Double) > threshold) {
                         echo "Warning: High response time detected."
                         // Additional steps to handle high response time
                     } else {
@@ -154,6 +160,7 @@ pipeline {
                 }
             }
         }
+        
         
         
         // Validate alerting policies in Cloud Monitoring
