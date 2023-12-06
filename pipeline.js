@@ -164,8 +164,8 @@ pipeline {
         stage('Check Application Performance') {
             steps {
                 script {
-                    // Replace 'metric-name' with the actual metric name and specify your defined threshold
-                    def cpuUsage = bat(script: "gcloud monitoring time-series query \"metric-name\" --limit=1 --format=\"value(point.value.doubleValue)\"", returnStdout: true).trim()
+                    // Replace 'METRIC_NAME' with the actual metric name and specify your defined threshold
+                    def cpuUsage = bat(script: "gcloud monitoring time-series list --metric=METRIC_NAME --limit=1 --format=\"value(point.value.doubleValue)\"", returnStdout: true).trim()
         
                     // Define your performance threshold
                     def YOUR_DEFINED_THRESHOLD = 0.8 // Example threshold, adjust as necessary
@@ -180,6 +180,7 @@ pipeline {
                 }
             }
         }
+        
         
         stage('Validate Alerting Policies') {
             steps {
