@@ -168,7 +168,7 @@ pipeline {
                     def metricName = "compute.googleapis.com/instance/cpu/utilization"
         
                     // Execute the gcloud command to retrieve the list of metric descriptors
-                    def metricsListOutput = bat(script: "gcloud monitoring metrics descriptors list --filter=\"metric.type='${metricName}'\" --format=\"get(description)\"", returnStdout: true).trim()
+                    def metricsListOutput = bat(script: "gcloud beta monitoring metrics-scopes list --filter=\"metric.type='${metricName}'\" --format=\"get(description)\"", returnStdout: true).trim()
         
                     // Check if the CPU utilization metric is present in the output
                     if (metricsListOutput.contains(metricName)) {
