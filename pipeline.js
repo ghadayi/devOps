@@ -131,16 +131,15 @@ pipeline {
         stage('Check Application Performance') {
             steps {
                 script {
-                    // Define the URL of your web application
-                    def appUrl = "http://34.124.220.35:80"
+                    // Define the URL of your web application as an environment variable
+                    env.APP_URL = "http://34.124.220.35:80"
         
                     // Execute a curl command to measure response time
-                    // Use single quotes for the script string
-                    def curlCommand = 'curl -o /dev/null -s -w "%{time_total}" ' + appUrl
-                    def responseTime = bat(script: curlCommand, returnStdout: true).trim()
+                    // Break down the command into simpler parts
+                    def responseTime = bat(script: "curl -o NUL -s -w %%{time_total} ${env.APP_URL}", returnStdout: true).trim()
         
                     // Log the response time
-                    echo "Response time for ${appUrl} is ${responseTime} seconds."
+                    echo "Response time for ${env.APP_URL} is ${responseTime} seconds."
         
                     // Define a threshold for response time (in seconds)
                     def threshold = 3.0 // Threshold set to 3 seconds
@@ -155,7 +154,6 @@ pipeline {
                 }
             }
         }
-        
         
         
         // Validate alerting policies in Cloud Monitoring
