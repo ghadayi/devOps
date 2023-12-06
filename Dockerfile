@@ -4,11 +4,24 @@ WORKDIR /app
 
 # Copy solution and project files and restore dependencies
 COPY *.sln .
+
+# Copy SampleApp project files
 COPY SampleApp/*.csproj ./SampleApp/
+
+# Add lines to copy csproj files for each test project
+COPY SampleApp.UnitTests/*.csproj ./SampleApp.UnitTests/
+
+
+# Run dotnet restore
 RUN dotnet restore
 
 # Copy the rest of the source code and build the app
 COPY SampleApp/. ./SampleApp/
+
+# Add lines to copy the rest of the source for each test project
+COPY SampleApp.UnitTests/. ./SampleApp.UnitTests/
+
+
 WORKDIR /app/SampleApp
 RUN dotnet publish -c Release -o out
 
